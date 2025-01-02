@@ -1,0 +1,108 @@
+@font-face {
+  font-family: "Berkeley";
+  src: url("../assets/BerkeleyMono-Regular.woff");
+}
+
+* {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: "Berkeley", monospace;
+  color: #d9d9d9;
+  background-color: #1a1a1a;
+}
+
+h1, h2, h3 {
+  color: #c7c7c7;
+}
+
+a {
+  color: orange;
+}
+
+#content {
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 30px;
+  padding-left: 30px;
+  /*
+  margin: 2rem auto;
+  padding: 0 1rem;
+  */
+}
+
+.experience-wrapper {
+  max-width: 900px;
+}
+
+.wrapper {
+  max-width: 740px;
+}
+
+/*==== Header ====*/
+header {
+  display: flex;
+  background-color: #2e2e2e;
+  padding: 0 0.8rem;
+  user-select: none;
+}
+
+header nav {
+  margin: auto 0;
+}
+
+header nav a {
+  user-select: none;
+  color: #faa21c;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+header nav a:hover {
+  text-decoration: underline;
+}
+
+header nav > * {
+  display: inline-block;
+}
+
+.contacts {
+    padding: 0.6rem 0;
+    float: right;
+    display: flex;
+    margin-left: auto;
+}
+
+.contacts a {
+  padding: 0 0.4rem;
+  background-color: transparent;
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+/* Tweaked subpage links to allow for bold monospaced fonts */
+.bald {
+    text-shadow: 1px 0 #888888;
+    font-weight:bold;
+}
+/*==== Header ====*/
+
+@media (max-width: 600px) {
+  body {
+    font-size: 18px;
+  }
+
+  /*==== Header ====*/
+  header nav > * {
+    font-size: 14px;
+  }
+
+  .contacts a {
+      padding: 0 0.3rem;
+      width: 1.5rem;
+      height: 1.5rem;
+  }
+  /*==== Header ====*/
+}

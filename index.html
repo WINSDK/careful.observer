@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Global Metadata -->
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="canonical" href="https://careful.observer/">
+
+  <!-- Meta tags -->
+  <title>Nicolas Mazzon</title>
+  <meta name="title" data-hid="title" content="Nicolas Mazzon">
+  <meta name="description" content="Having fun writing">
+  <meta name="author" content="Nicolas Mazzon <nicolas@careful.observer>">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://careful.observer">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="Having fun writing">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://careful.observer">
+  <meta property="twitter:title" content="Nicolas's blog">
+  <meta property="twitter:description" content="Having fun writing">
+  <meta property="twitter:image" content="https://careful.observer/this_url_doesnt_exist">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a 
+         href="#" 
+         class="bald"
+         hx-get="about.html" 
+         hx-target="#content"
+         hx-trigger="click"
+         hx-swap="innerHTML"
+         onclick="document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald')); this.classList.add('bald'); return false;">
+         About
+      </a>
+      <span>|</span>
+      <a 
+         href="#" 
+         hx-get="blog.html" 
+         hx-target="#content"
+         hx-trigger="click"
+         hx-swap="innerHTML"
+         onclick="document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald')); this.classList.add('bald'); return false;">
+         Blog
+      </a>
+      <span>|</span>
+      <a 
+         href="#" 
+         hx-get="experience.html" 
+         hx-target="#content"
+         hx-trigger="click"
+         hx-swap="innerHTML"
+         onclick="document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald')); this.classList.add('bald'); return false;">
+         Experience
+      </a>
+    </nav>
+
+    <div class="contacts">
+      <a target="_blank" href="https://www.linkedin.com/in/nicolas-mazzon-524216168" title="linkedin">
+        <img src="assets/logo-linkedin.svg">
+      </a>
+      <a target="_blank" href="https://github.com/winsdk" title="git repos">
+        <img src="assets/logo-github.svg">
+      </a>
+      <a href="mailto:nicolas@careful.observer" title="send me an email">
+        <img src="assets/at.svg">
+      </a>
+    </div>
+  </header>
+
+  <div id="content">
+    <div class="wrapper">
+      <h2>Welcome</h2>
+      <p>Click on “About,” “Blog,” or “Experience” above to load different sections using htmx.</p>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+/*====Rotating characters=====*/
+@-webkit-keyframes tr1 {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-20deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes tr1 {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-20deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@-webkit-keyframes tr2 {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(20deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes tr2 {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(20deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animwrap {
+  display: inline-flex;
+  user-select: none;
+}
+
+.animwrap span {
+  display: inline-block;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animwrap span.-tr1 {
+  -webkit-animation: tr1 4s 0s ease;
+          animation: tr1 4s 0s ease;
+}
+
+.animwrap span.-tr2 {
+  -webkit-animation: tr2 4s 0s ease;
+          animation: tr2 4s 0s ease;
+}
+
+.animwrap::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #000;
+  -webkit-clip-path: inset(0 100% 0 0);
+          clip-path: inset(0 100% 0 0);
+  content: "";
+  height: 100%;
+  width: 100%;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
