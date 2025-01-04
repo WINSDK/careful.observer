@@ -1,34 +1,21 @@
 <link rel="stylesheet" href="/css/animation.css">
 <style>
-#content {
-  max-width: 900px;
-}
-
 .split-layout {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  text-align: left;
   gap: 2rem;
 }
 
 .split-left {
   flex: 1 1 250px;
+  flex-basis: 45%;
+  max-width: 500px;
 }
 
-.right-box {
-  flex: 1;
+.split-right {
   min-width: 600px;
-}
-
-.right-box ul {
-  list-style: none;
-  padding: 0;
-}
-
-.right-box li {
-  margin-bottom: 1rem;
 }
 
 .desc {
@@ -44,6 +31,7 @@ li {
 
 li > * {
   font-size: 1.5rem;
+  color: white;
 }
 
 li > a {
@@ -52,6 +40,11 @@ li > a {
 
 li > a:hover {
   text-decoration: underline;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
 }
 
 a {
@@ -63,8 +56,12 @@ h2::before {
     color: orange;
 }
 
-@media (max-width: 600px) {
-  .right-box {
+@media (max-width: 700px) {
+  .split-left {
+    max-width: 100%;
+  }
+
+  .split-right {
     min-width: 100%;
   }
 }
@@ -82,7 +79,7 @@ some stuff I've worked on. Feel free to poke around, and don't hesitate to reach
 </p>
   </div>
 
-  <div class="right-box">
+  <div class="split-right">
     <ul>
       <h2>
         <!-- Personal Projects -->
@@ -135,33 +132,16 @@ some stuff I've worked on. Feel free to poke around, and don't hesitate to reach
       </h2>
       <li>
         <div class="desc">August 2024 - Present</div>
-        Nanyang Technological University
+        <span>Nanyang Technological University</span>
       </li>
       <li>
         <div class="desc">September 2022 - Present</div>
-        University of Amsterdam
+        <span>University of Amsterdam</span>
       </li>
     </ul>
   </div>
 </div>
 
 <script>
-const animatedElements = [...document.querySelectorAll(".animwrap")];
-
-function updateAnimated() {
-    const animated = animatedElements[Math.floor(Math.random() * animatedElements.length)];
-    const chars = [...animated.querySelectorAll("span")];
-    const selected = Math.floor(Math.random() * chars.length);
-
-    for (const [idx, char] of chars.entries()) {
-        char.classList.remove("-tr1"),
-        char.classList.remove("-tr2");
-
-        if (selected == idx) {
-            const n = Math.floor(2 * Math.random()) + 1;
-            char.classList.add(`-tr${n}`);
-        }
-    }
-}
-setInterval(updateAnimated, 3000);
+// setInterval(updateAnimated, 3000);
 </script>

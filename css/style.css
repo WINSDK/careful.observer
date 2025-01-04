@@ -8,13 +8,14 @@
 }
 
 body {
+  font-size: 18px;
   margin: 0;
   font-family: "Berkeley", monospace;
   color: #d9d9d9;
   background-color: #1a1a1a;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
   color: #c7c7c7;
 }
 
@@ -23,22 +24,12 @@ a {
 }
 
 #content {
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: 30px;
-  padding-left: 30px;
-  /*
-  margin: 2rem auto;
-  padding: 0 1rem;
-  */
-}
-
-.experience-wrapper {
-  max-width: 900px;
+  padding: 1rem 20px 1.25rem 20px;
 }
 
 .wrapper {
-  max-width: 740px;
+  max-width: 930px;
+  margin: 0 auto;
 }
 
 /*==== Header ====*/
@@ -69,10 +60,10 @@ header nav > * {
 }
 
 .contacts {
-    padding: 0.6rem 0;
-    float: right;
-    display: flex;
-    margin-left: auto;
+  padding: 0.6rem 0;
+  float: right;
+  display: flex;
+  margin-left: auto;
 }
 
 .contacts a {
@@ -84,25 +75,46 @@ header nav > * {
 
 /* Tweaked subpage links to allow for bold monospaced fonts */
 .bald {
-    text-shadow: 1px 0 #888888;
-    font-weight:bold;
+  text-shadow: 1px 0 #888888;
+  font-weight: bold;
 }
 /*==== Header ====*/
 
-@media (max-width: 600px) {
+/*==== Mobile styles ====*/
+@media (max-width: 700px) {
   body {
-    font-size: 18px;
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  h4 {
+    font-size: 1rem;
+  }
+
+  #content {
+    padding: 1rem 16px 4.25rem 16px;
   }
 
   /*==== Header ====*/
   header nav > * {
-    font-size: 14px;
+    font-size: 0.88rem;
   }
 
   .contacts a {
-      padding: 0 0.3rem;
-      width: 1.5rem;
-      height: 1.5rem;
+    padding: 0 0.3rem;
+    width: 1.5rem;
+    height: 1.5rem;
   }
   /*==== Header ====*/
 }

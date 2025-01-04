@@ -29,39 +29,52 @@
 
   <link rel="stylesheet" href="/css/style.css">
   <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/htmx-ext-preload@2.1.0/preload.js"></script>
 </head>
 
-<body>
+<body hx-ext="preload">
   <header>
-    <nav>
-      <a 
-         href="#" 
+    <nav preload="preload:init">
+      <a
+         href="#"
          class="bald"
-         hx-get="about.html" 
+         hx-get="/about.html"
          hx-target="#content"
          hx-trigger="click"
          hx-swap="innerHTML"
-         onclick="document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald')); this.classList.add('bald'); return false;">
+         hx-push-url="true"
+         onclick="
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald'));
+            this.classList.add('bald');
+            return false;">
          About
       </a>
       <span>|</span>
-      <a 
-         href="#" 
-         hx-get="blog.html" 
+      <a
+         href="#"
+         hx-get="/blog.html"
          hx-target="#content"
          hx-trigger="click"
          hx-swap="innerHTML"
-         onclick="document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald')); this.classList.add('bald'); return false;">
+         hx-push-url="true"
+         onclick="
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald'));
+            this.classList.add('bald');
+            return false;">
          Blog
       </a>
       <span>|</span>
-      <a 
-         href="#" 
-         hx-get="experience.html" 
+      <a
+         href="#"
+         hx-get="/experience.html"
          hx-target="#content"
          hx-trigger="click"
          hx-swap="innerHTML"
-         onclick="document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald')); this.classList.add('bald'); return false;">
+         hx-push-url="true"
+         onclick="
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald'));
+            this.classList.add('bald');
+            return false;">
          Experience
       </a>
     </nav>
@@ -81,10 +94,32 @@
 
   <div id="content">
     <div class="wrapper">
-      <h2>Welcome</h2>
-      <p>Click on “About,” “Blog,” or “Experience” above to load different sections using htmx.</p>
+      <h1>About</h1>
+      <p>
+        Hello! I’m Nicolas Mazzon—this is the “About” section. I’m a tech enthusiast passionate
+        about compilers, low-level programming, and pixel art in Vulkan. Have a look around!
+      </p>
     </div>
   </div>
+
+  <script>
+function updateAnimated() {
+    const animatedElements = [...document.querySelectorAll(".animwrap")];
+    const animated = animatedElements[Math.floor(Math.random() * animatedElements.length)];
+    const chars = [...animated.querySelectorAll("span")];
+    const selected = Math.floor(Math.random() * chars.length);
+
+    for (const [idx, char] of chars.entries()) {
+        char.classList.remove("-tr1"),
+        char.classList.remove("-tr2");
+
+        if (selected == idx) {
+            const n = Math.floor(2 * Math.random()) + 1;
+            char.classList.add(`-tr${n}`);
+        }
+    }
+}
+  </script>
 </body>
 
 </html>

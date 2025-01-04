@@ -1,7 +1,71 @@
+<style>
+li {
+  border-left: solid 4px #444444;
+  padding-left: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+li > * {
+  font-size: 1.5rem;
+  color: white;
+}
+
+li > a {
+  text-decoration: none;
+}
+
+li > a:hover {
+  text-decoration: underline;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.desc {
+    color: #ACB39A;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 700px) {
+  h1 {
+    margin-top: 0;
+  }
+}
+</style>
 <div class="wrapper">
   <h1>Blog</h1>
-  <p>
-    Welcome to my blog section. I frequently write about system programming,
-    graphics programming, and personal projects. Stay tuned for updates!
-  </p>
+  <ul preload="mouseover">
+    <li>
+      <div class="desc">Nov 16, 2021</div>
+      <a href="#"
+         hx-get="/posts/test.html"
+         hx-target="#content"
+         hx-trigger="click"
+         hx-push-url="true">
+         Running over the road
+      </a>
+    </li>
+    <li>
+      <div class="desc">Nov 16, 2021</div>
+      <a>Running over the road</a>
+    </li>
+    <li>
+      <div class="desc">Nov 16, 2021</div>
+      <a>Running over the road</a>
+    </li>
+    <li>
+      <div class="desc">Nov 16, 2021</div>
+      <a>Running over the road</a>
+    </li>
+    <li>
+      <div class="desc">Nov 16, 2021</div>
+      <a>Running over the road</a>
+    </li>
+    <li>
+      <div class="desc">Nov 16, 2021</div>
+      <a>Running over the road</a>
+    </li>
+  </ul>
 </div>
