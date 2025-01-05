@@ -18,8 +18,9 @@ for md_file in *.md; do
   pandoc "$md_file" \
          --template=template.html \
          --highlight-style=gruvbox.theme \
-         -s \
-         -o "$html_file"
+         --syntax-definition=rust.xml \
+         --standalone \
+         --output="$html_file"
 
   echo "Finished converting '$md_file' to '$html_file'."
 done

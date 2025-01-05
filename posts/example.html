@@ -1,11 +1,20 @@
 <style>
 body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, hr, dl, dd, ol, ul, figure {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6, p, blockquote, pre, ul, ol, dl, figure, .highlight {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+code {
+  background: #8e5a1d;
+  font-family: "Berkeley", monospace;
+}
+
+li {
+  margin-left: 1.5rem;
 }
 
 .wrapper {
@@ -61,16 +70,35 @@ div.sourceCode
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span { color: #ebdbb2; background-color: #282828; } /* Normal */
-code span.cf { color: #8ec07c; font-weight: bold; } /* ControlFlow */
+code span.al { color: #fb4934; font-weight: bold; } /* Alert */
+code span.an { color: #928374; } /* Annotation */
+code span.at { color: #d3869b; } /* Attribute */
+code span.bn { color: #89c7b4; } /* BaseN */
+code span.bu { color: #bcc447; } /* BuiltIn */
+code span.cf { color: #e6453e; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #80aa9e; } /* Char */
 code span.cn { color: #d3869b; } /* Constant */
-code span.co { color: #928374; font-style: italic; } /* Comment */
+code span.co { color: #928374; } /* Comment */
+code span.cv { color: #928374; } /* CommentVar */
+code span.do { color: #928374; } /* Documentation */
+code span.dt { color: #80aa9e; } /* DataType */
+code span.dv { color: #d3869b; } /* DecVal */
+code span.er { color: #bcc447; } /* Error */
+code span.ex { color: #bcc447; } /* Extension */
+code span.fl { color: #d3869b; } /* Float */
 code span.fu { color: #b8bb26; } /* Function */
-code span.kw { color: #8ec07c; } /* Keyword */
+code span.im { color: #bcc447; } /* Import */
+code span.in { color: #80aa9e; font-weight: bold; } /* Information */
+code span.kw { color: #e6453e; } /* Keyword */
 code span.op { color: #d3869b; } /* Operator */
 code span.ot { color: #fabd2f; } /* Other */
+code span.pp { color: #bcc447; } /* Preprocessor */
 code span.sc { color: #fe8019; } /* SpecialChar */
-code span.st { color: #b8bb26; } /* String */
+code span.ss { color: #80aa9e; } /* SpecialString */
+code span.st { color: #80aa9e; } /* String */
 code span.va { color: #d3869b; } /* Variable */
+code span.vs { color: #b8bb26; font-weight: bold; } /* VerbatimString */
+code span.wa { color: #fabd2f; font-weight: bold; } /* Warning */
 
 div.sourceCode {
   border: 2px solid #444444;
@@ -84,10 +112,8 @@ pre.sourceCode {
 <div class="wrapper">
   <h1 class="title">Running over the road</h1>
   <div class="date-note">Nov 16, 2021</div>
-  <h2 id="introduction">Introduction</h2>
-  <h3 id="one">One</h3>
-  <h4 id="two">Two</h4>
   <p>My experience jaywalking in the Netherlands.</p>
+  <h2 id="introduction">Introduction</h2>
   <blockquote>
   <p>Viola! Here we see the two different secret values on the attacking
   thread, at a pretty much comparable frequency.</p>
@@ -99,20 +125,28 @@ pre.sourceCode {
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">mov</span>  <span class="kw">rax</span><span class="op">,</span> <span class="bn">0x1337133713371337</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">mov</span> <span class="op">[</span><span class="bn">0x1008</span><span class="op">],</span> <span class="kw">rax</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>2:</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">label0:</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">mov</span> <span class="kw">rax</span><span class="op">,</span> <span class="op">[</span><span class="bn">0x1000</span><span class="op">]</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">mov</span> <span class="kw">rax</span><span class="op">,</span> <span class="op">[</span><span class="bn">0x1008</span><span class="op">]</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">jmp</span> <span class="dv">2</span><span class="er">b</span></span></code></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">jmp</span> label0</span></code></pre></div>
+  <p><img
+  src="https://static.vecteezy.com/system/resources/previews/011/063/921/non_2x/example-button-speech-bubble-example-colorful-web-banner-illustration-vector.jpg"
+  alt="example-image" /> <em><sub>subtitle goes here</sub></em></p>
   <p>Cool… so now we have a technique that will allow us to see the
   contents of all loads on load ports, but randomly sampled only. Let’s
   take a look at the weird behaviors during accessed bit updates by
   clearing the accessed bit on the final level page tables every loop in
-  the same code above.</p>
-  <figure>
-  <img
-  src="https://static.vecteezy.com/system/resources/previews/011/063/921/non_2x/example-button-speech-bubble-example-colorful-web-banner-illustration-vector.jpg"
-  alt="example-image" />
-  <figcaption aria-hidden="true">example-image</figcaption>
-  </figure>
+  the same <code>IA32_DEBUGCTL</code> above.</p>
+  <div class="sourceCode" id="cb2"><pre
+  class="sourceCode rust"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span> Match <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">/// Iterate through all items that match.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">pub</span> <span class="kw">fn</span><span class="pp"> iter</span><span class="op">&lt;</span><span class="ot">&#39;s</span><span class="op">,</span> Metadata<span class="op">&gt;</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">&amp;</span><span class="kw">self</span><span class="op">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        tree<span class="op">:</span> <span class="op">&amp;</span><span class="ot">&#39;s</span> PrefixMatch<span class="op">&lt;</span>Metadata<span class="op">&gt;,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item <span class="op">=</span> (<span class="op">&amp;</span><span class="ot">&#39;s</span> <span class="dt">str</span><span class="op">,</span> <span class="op">&amp;</span><span class="ot">&#39;s</span> Metadata)<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;asdasdasd&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        tree<span class="op">.</span>items[<span class="kw">self</span><span class="op">.</span>range<span class="op">.</span><span class="er">clone</span>()]<span class="op">.</span><span class="er">iter</span>()<span class="op">.</span><span class="er">map</span>(<span class="op">|</span>item<span class="op">|</span> (item<span class="op">.</span><span class="dv">0</span><span class="op">.</span><span class="er">as_str</span>()<span class="op">,</span> <span class="op">&amp;</span>item<span class="op">.</span><span class="dv">1</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
   <p>what is this thing?</p>
 </div>

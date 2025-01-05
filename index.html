@@ -37,7 +37,6 @@
     <nav preload="preload:init">
       <a
          href="#"
-         class="bald"
          hx-get="/about.html"
          hx-target="#content"
          hx-trigger="click"
@@ -63,20 +62,6 @@
             return false;">
          Blog
       </a>
-      <span>|</span>
-      <a
-         href="#"
-         hx-get="/experience.html"
-         hx-target="#content"
-         hx-trigger="click"
-         hx-swap="innerHTML"
-         hx-push-url="true"
-         onclick="
-            document.querySelectorAll('nav a').forEach(a => a.classList.remove('bald'));
-            this.classList.add('bald');
-            return false;">
-         Experience
-      </a>
     </nav>
 
     <div class="contacts">
@@ -93,12 +78,7 @@
   </header>
 
   <div id="content">
-    <div class="wrapper">
-      <h1>About</h1>
-      <p>
-        Hello! I’m Nicolas Mazzon—this is the “About” section. I’m a tech enthusiast passionate
-        about compilers, low-level programming, and pixel art in Vulkan. Have a look around!
-      </p>
+    <div hx-get="/about.html" hx-target="#content" hx-trigger="load" hx-swap="innerHTML">
     </div>
   </div>
 

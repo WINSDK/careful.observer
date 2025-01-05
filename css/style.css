@@ -50,8 +50,8 @@ a {
 }
 
 .date-note {
-    color: #ACB39A;
-    font-size: 1rem;
+  color: #ACB39A;
+  font-size: 1rem;
 }
 
 /*==== Header ====*/
@@ -102,26 +102,9 @@ header nav > * {
 }
 /*==== Header ====*/
 
-/*==== Mobile styles ====*/
 @media (max-width: 700px) {
   body {
     font-size: 16px;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
-
-  h2 {
-    font-size: 1.6rem;
-  }
-
-  h3 {
-    font-size: 1.3rem;
-  }
-
-  h4 {
-    font-size: 1rem;
   }
 
   #content {
@@ -133,14 +116,10 @@ header nav > * {
   }
 
   .date-note {
-      font-size: 0.85rem;
+    font-size: 0.85rem;
   }
 
   /*==== Header ====*/
-  header nav > * {
-    font-size: 0.88rem;
-  }
-
   .contacts a {
     padding: 0 0.3rem;
     width: 1.5rem;
