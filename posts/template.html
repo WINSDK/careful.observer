@@ -13,6 +13,16 @@ code {
   font-family: "Berkeley", monospace;
 }
 
+blockquote > p {
+  margin-bottom: 0;
+}
+
+blockquote > p::before {
+  content: "> ";
+  user-select: none;
+  color: pink;
+}
+
 li {
   margin-left: 1.5rem;
 }

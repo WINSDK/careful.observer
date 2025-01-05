@@ -13,6 +13,16 @@ code {
   font-family: "Berkeley", monospace;
 }
 
+blockquote > p {
+  margin-bottom: 0;
+}
+
+blockquote > p::before {
+  content: "> ";
+  user-select: none;
+  color: pink;
+}
+
 li {
   margin-left: 1.5rem;
 }
@@ -116,7 +126,8 @@ pre.sourceCode {
   <h2 id="introduction">Introduction</h2>
   <blockquote>
   <p>Viola! Here we see the two different secret values on the attacking
-  thread, at a pretty much comparable frequency.</p>
+  thread</p>
+  <p>at a pretty much comparable frequency.</p>
   </blockquote>
   <div class="sourceCode" id="cb1"><pre
   class="sourceCode asm"><code class="sourceCode fasm"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">mov</span>  <span class="kw">rax</span><span class="op">,</span> <span class="bn">0x12345678f00dfeed</span></span>
@@ -149,4 +160,6 @@ pre.sourceCode {
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
   <p>what is this thing?</p>
+  <div class="sourceCode" id="cb3"><pre
+  class="sourceCode css"><code class="sourceCode css"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Using css as a language makes this render correctly...</span></code></pre></div>
 </div>

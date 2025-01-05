@@ -7,8 +7,8 @@ My experience jaywalking in the Netherlands.
 
 ## Introduction
 
-> Viola! Here we see the two different secret values on the attacking thread, at
-> a pretty much comparable frequency.
+> Viola! Here we see the two different secret values on the attacking thread\
+> at a pretty much comparable frequency.
 
 ```asm
 mov  rax, 0x12345678f00dfeed
@@ -46,3 +46,7 @@ impl Match {
 ```
 
 what is this thing?
+
+```css
+Using css as a language makes this render correctly...
+```

@@ -19,6 +19,7 @@ for md_file in *.md; do
          --template=template.html \
          --highlight-style=gruvbox.theme \
          --syntax-definition=rust.xml \
+         --lua-filter=split_blockquotes.lua \
          --standalone \
          --output="$html_file"
 
