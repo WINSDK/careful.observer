@@ -8,15 +8,19 @@
 }
 
 body {
+  color: white;
+  overflow-wrap: break-word;
+  line-height: 1.5;
   font-size: 18px;
   margin: 0;
   font-family: "Berkeley", monospace;
-  color: #d9d9d9;
   background-color: #1a1a1a;
 }
 
-h1, h2, h3, h4 {
-  color: #c7c7c7;
+h1, h2, h3, h4, p {
+  padding: 0;
+  margin: 0;
+  margin-bottom: 15px;
 }
 
 a {
@@ -28,8 +32,26 @@ a {
 }
 
 .wrapper {
-  max-width: 930px;
+  max-width: 800px;
   margin: 0 auto;
+}
+
+.article-title {
+  font-size: 24px;
+}
+
+.article-title > a {
+  color: white;
+  text-decoration: none;
+}
+
+.article-title > a:hover {
+  text-decoration: underline;
+}
+
+.date-note {
+    color: #ACB39A;
+    font-size: 1rem;
 }
 
 /*==== Header ====*/
@@ -104,6 +126,14 @@ header nav > * {
 
   #content {
     padding: 1rem 16px 4.25rem 16px;
+  }
+
+  .article-title {
+    font-size: 1.3rem;
+  }
+
+  .date-note {
+      font-size: 0.85rem;
   }
 
   /*==== Header ====*/

@@ -2,30 +2,13 @@
 li {
   border-left: solid 4px #444444;
   padding-left: 1rem;
-  margin-bottom: 0.75rem;
-}
-
-li > * {
-  font-size: 1.5rem;
-  color: white;
-}
-
-li > a {
-  text-decoration: none;
-}
-
-li > a:hover {
-  text-decoration: underline;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 ul {
   list-style: none;
   padding: 0;
-}
-
-.desc {
-    color: #ACB39A;
-    font-size: 0.8rem;
 }
 
 @media (max-width: 700px) {
@@ -38,34 +21,16 @@ ul {
   <h1>Blog</h1>
   <ul preload="mouseover">
     <li>
-      <div class="desc">Nov 16, 2021</div>
-      <a href="#"
-         hx-get="/posts/test.html"
-         hx-target="#content"
-         hx-trigger="click"
-         hx-push-url="true">
-         Running over the road
-      </a>
-    </li>
-    <li>
-      <div class="desc">Nov 16, 2021</div>
-      <a>Running over the road</a>
-    </li>
-    <li>
-      <div class="desc">Nov 16, 2021</div>
-      <a>Running over the road</a>
-    </li>
-    <li>
-      <div class="desc">Nov 16, 2021</div>
-      <a>Running over the road</a>
-    </li>
-    <li>
-      <div class="desc">Nov 16, 2021</div>
-      <a>Running over the road</a>
-    </li>
-    <li>
-      <div class="desc">Nov 16, 2021</div>
-      <a>Running over the road</a>
+      <div class="date-note">Nov 16, 2021</div>
+      <div class="article-title">
+        <a href="#"
+           hx-get="/posts/example.html"
+           hx-target="#content"
+           hx-trigger="click"
+           hx-push-url="true">
+           Running over the road
+        </a>
+      </div>
     </li>
   </ul>
 </div>

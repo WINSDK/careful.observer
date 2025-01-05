@@ -1,0 +1,92 @@
+{
+  "text-color": "#ebdbb2",
+  "background-color": "#282828",
+  "line-number-color": "#a89984",
+  "line-number-background-color": "#282828",
+  "text-styles": {
+    "Normal":      {
+        "text-color": "#ebdbb2",
+        "background-color": "#282828",
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "Keyword":     {
+        "text-color": "#8ec07c",
+        "background-color": null,
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "ControlFlow": {
+        "text-color": "#8ec07c",
+        "background-color": null,
+        "bold": true,
+        "italic": false,
+        "underline": false
+    },
+    "Function": {
+        "text-color": "#b8bb26",
+        "background-color": null,
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "Operator":    {
+        "text-color": "#d3869b",
+        "background-color": null,
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "Variable":    {
+        "text-color": "#d3869b",
+        "background-color": null,
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "String":      {
+        "text-color": "#b8bb26",
+        "background-color": null,
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "Comment":     {
+        "text-color": "#928374",
+        "background-color": null,
+        "bold": false,
+        "italic": true,
+        "underline": false
+    },
+    "Constant":    {
+        "text-color": "#d3869b",
+        "background-color": null,
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "Type":        {
+        "text-color": "#fabd2f",
+        "background-color": null,
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "SpecialChar": {
+        "text-color": "#fe8019",
+        "background-color": null,
+        "bold": false,
+        "italic": false,
+        "underline": false
+    },
+    "Todo":        {
+        "text-color": "#fe8019",
+        "background-color": "#282828",
+        "bold": true,
+        "italic": false,
+        "underline": false
+     }
+  }
+}

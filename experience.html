@@ -18,6 +18,9 @@
   min-width: 600px;
 }
 
+.split-right > * {
+}
+
 .desc {
   color: #ACB39A;
   font-size: 1rem;
@@ -26,20 +29,8 @@
 li {
   border-left: solid 4px #444444;
   padding-left: 1rem;
-  margin-bottom: 0.75rem;
-}
-
-li > * {
-  font-size: 1.5rem;
-  color: white;
-}
-
-li > a {
-  text-decoration: none;
-}
-
-li > a:hover {
-  text-decoration: underline;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 ul {
@@ -57,6 +48,14 @@ h2::before {
 }
 
 @media (max-width: 700px) {
+  .desc {
+    font-size: 0.8rem;
+  }
+
+  .split-layout {
+    gap: 0;
+  }
+
   .split-left {
     max-width: 100%;
   }
@@ -105,15 +104,21 @@ some stuff I've worked on. Feel free to poke around, and don't hesitate to reach
       </h2>
       <li>
         <div class="desc">Disassembler/Debugger for multiple architectures</div>
-        <a href="https://github.com/WINSDK/bite" target="_blank">BiTE debugger</a>
+        <div class="article-title">
+          <a href="https://github.com/WINSDK/bite" target="_blank">BiTE debugger</a>
+        </div>
       </li>
       <li>
         <div class="desc">Card trading platform</div>
-        <a href="https://github.com/WINSDK/Webtechnologie-UvA-2022" target="_blank">Webtechnologie UvA 2022/2023</a>
+        <div class="article-title">
+          <a href="https://github.com/WINSDK/Webtechnologie-UvA-2022" target="_blank">Webtechnologie UvA 2022/2023</a>
+        </div>
       </li>
       <li>
         <div class="desc">Small game with upscaling of 2D pixel art sprites</div>
-        <a href="https://github.com/WINSDK/chair" target="_blank">Vulkan pixel art engine</a>
+        <div class="article-title">
+          <a href="https://github.com/WINSDK/chair" target="_blank">Vulkan pixel art engine</a>
+        </div>
       </li>
 
       <h2>
@@ -132,11 +137,15 @@ some stuff I've worked on. Feel free to poke around, and don't hesitate to reach
       </h2>
       <li>
         <div class="desc">August 2024 - Present</div>
-        <span>Nanyang Technological University</span>
+        <div class="article-title">
+          <span>Nanyang Technological University</span>
+        </div>
       </li>
       <li>
         <div class="desc">September 2022 - Present</div>
-        <span>University of Amsterdam</span>
+        <div class="article-title">
+          <span>University of Amsterdam</span>
+        </div>
       </li>
     </ul>
   </div>
