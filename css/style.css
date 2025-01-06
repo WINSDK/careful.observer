@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Berkeley";
-  src: url("../assets/BerkeleyMono-Regular.woff");
+  src: url("/assets/BerkeleyMono-Regular.woff");
 }
 
 * {

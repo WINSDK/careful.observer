@@ -37,7 +37,7 @@
     <nav preload="preload:init">
       <a
          href="#"
-         hx-get="/about.html"
+         hx-get="/about"
          hx-target="#content"
          hx-trigger="click"
          hx-swap="innerHTML"
@@ -51,7 +51,7 @@
       <span>|</span>
       <a
          href="#"
-         hx-get="/blog.html"
+         hx-get="/blog"
          hx-target="#content"
          hx-trigger="click"
          hx-swap="innerHTML"
@@ -66,20 +66,19 @@
 
     <div class="contacts">
       <a target="_blank" href="https://www.linkedin.com/in/nicolas-mazzon-524216168" title="linkedin">
-        <img src="assets/logo-linkedin.svg">
+        <img src="/assets/logo-linkedin.svg">
       </a>
       <a target="_blank" href="https://github.com/winsdk" title="git repos">
-        <img src="assets/logo-github.svg">
+        <img src="/assets/logo-github.svg">
       </a>
       <a href="mailto:nicolas@careful.observer" title="send me an email">
-        <img src="assets/at.svg">
+        <img src="/assets/at.svg">
       </a>
     </div>
   </header>
 
   <div id="content">
-    <div hx-get="/about.html" hx-target="#content" hx-trigger="load" hx-swap="innerHTML">
-    </div>
+    {{ content-body }}
   </div>
 
   <script>

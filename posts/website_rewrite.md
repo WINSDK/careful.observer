@@ -28,6 +28,8 @@ Something about styling, pandoc (custom template, rust.xml and filter).
 Something about trying to keep using nginx. Writing single-page application (SPA)
 and reloading being broken.
 
+Something about not being able to use nginx and writing a server in axum.
+
 ```css
 server {
     listen 80;

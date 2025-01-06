@@ -9,6 +9,8 @@ echo_error() {
     echo -e "\033[1;31m[ERROR]\033[0m $1" >&2
 }
 
+rm -rf bundle
+
 # Define the bundle directory
 BUNDLE_DIR="bundle"
 
