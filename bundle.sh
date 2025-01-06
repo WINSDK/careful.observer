@@ -30,7 +30,7 @@ echo_info "Copying 'css' directory to '$BUNDLE_DIR/css'..."
 cp -r css/* "$BUNDLE_DIR/css/"
 
 echo_info "Running 'convert.sh' in the 'posts' directory..."
-pushd posts > /dev/null
+pushd blog > /dev/null
 if [ -x "./convert.sh" ]; then
     ./convert.sh
 else
@@ -39,8 +39,10 @@ else
 fi
 popd > /dev/null
 
-echo_info "Copying .md files to '$BUNDLE_DIR/posts'..."
-cp posts/*.md "$BUNDLE_DIR/posts/"
+echo_info "Copying .html files to '$BUNDLE_DIR/posts'..."
+cp posts/*.html "$BUNDLE_DIR/posts/"
+rm posts/*.html
+
 
 # Verify that the necessary files have been copied.
 echo_info "Verifying bundle contents..."
@@ -49,7 +51,7 @@ if [ -d "$BUNDLE_DIR" ] && \
    [ -d "$BUNDLE_DIR/assets" ] && \
    [ -d "$BUNDLE_DIR/css" ] && \
    [ -d "$BUNDLE_DIR/posts" ] && \
-   ls "$BUNDLE_DIR/posts"/*.md &> /dev/null; then
+   ls "$BUNDLE_DIR/posts"/*.html &> /dev/null; then
     echo -e "\033[1;32mBundle created successfully in '$BUNDLE_DIR' directory.\033[0m"
 else
     echo_error "Bundle creation failed. Please check the script for issues."

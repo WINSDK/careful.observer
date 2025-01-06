@@ -1,3 +1,4 @@
 posts/*.html
+!posts/template.html
 assets/BerkeleyMono-Regular.woff
 bundle/

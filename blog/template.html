@@ -1,0 +1,61 @@
+<style>
+body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, hr, dl, dd, ol, ul, figure {
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p, blockquote, pre, ul, ol, dl, figure, .highlight {
+  margin-bottom: 15px;
+}
+
+code {
+  background: #8e5a1d;
+  font-family: "Berkeley", monospace;
+}
+
+blockquote > p {
+  margin-bottom: 0;
+}
+
+blockquote > p::before {
+  content: "> ";
+  user-select: none;
+  color: pink;
+}
+
+li {
+  margin-left: 1.5rem;
+}
+
+.wrapper {
+  font-size: 15px;
+}
+
+.title {
+  margin-bottom: 0.2rem;
+}
+
+.date-note {
+  margin-bottom: 2rem;
+}
+
+img {
+  max-width: 100%;
+}
+
+$highlighting-css$
+
+div.sourceCode {
+  border: 2px solid #444444;
+}
+
+pre.sourceCode {
+  margin: 1rem;
+  border: 10px green;
+}
+</style>
+<div class="wrapper">
+  <h1 class="title">$title$</h1>
+  <div class="date-note">$date$</div>
+  $body$
+</div>

@@ -2,7 +2,7 @@
 set -e
 
 # Loop through all .md files in the current directory.
-for md_file in *.md; do
+for md_file in ../posts/*.md; do
   # If no .md files are found, the loop will still run once with "*.md" literal
   # so we check if the file really exists.
   if [[ ! -f "$md_file" ]]; then
