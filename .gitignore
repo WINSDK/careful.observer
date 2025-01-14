@@ -2,3 +2,5 @@ posts/*.html
 !posts/template.html
 assets/BerkeleyMono-Regular.woff
 bundle/
+oserver/_build
+server/target
