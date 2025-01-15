@@ -51,7 +51,7 @@ let read_and_subs path header =
   then read_cached path
   else (
     let body = read_cached path in
-    if Map.mem header "HX-Request"
+    if Map.mem header "hx-request"
     then body
     else (
       let template = read_cached (normalize_path "/index") in
@@ -59,13 +59,19 @@ let read_and_subs path header =
 ;;
 
 type request_kind =
-  | Get of
-      { uri : string
+  | Get
+  | Head
+[@@deriving equal, sexp]
+
+type request =
+  | Valid of
+      { kind : request_kind
+      ; uri : string
       ; version : string
       }
-  | Unsupported of { issue : string }
   | Invalid
-[@@deriving sexp]
+  | Unsupported of { issue : string }
+[@@deriving equal, sexp]
 
 let parse_request request =
   let parse_request_top line =
@@ -74,9 +80,11 @@ let parse_request request =
     match split with
     | [ kind; uri; version ] ->
       (match kind with
-       | "GET" ->
+       | "GET" | "HEAD" ->
+         let kind = if String.equal kind "GET" then Get else Head in
          (match version with
-          | "HTTP/0.9" | "HTTP/1.1" | "HTTP/1.2" | "HTTP/2" -> Get { uri; version }
+          | "HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2" | "HTTP/2" ->
+            Valid { kind; uri; version }
           | "HTTP/3" -> Unsupported { issue = "HTTP/3" }
           | _ -> Invalid)
        | ("PUT" | "DELETE" | "POST") as issue -> Unsupported { issue }
@@ -91,6 +99,7 @@ let parse_request request =
       lines
       |> List.filter_map ~f:(String.lsplit2 ~on:':')
       |> List.map ~f:(fun (k, v) -> String.strip k, String.strip v)
+      |> List.map ~f:(fun (k, v) -> String.lowercase k, String.lowercase v)
       |> Map.of_alist_exn (module String)
     in
     kind, header
@@ -116,11 +125,13 @@ let http_date () =
   Time.format ~zone:Time.Zone.utc now "%a, %d %b %Y %H:%M:%S GMT"
 ;;
 
-let html_header_and_body uri version body =
+let html_header_and_body uri version body include_body =
+  let body_len = String.length body in
+  let body = if include_body then body else "" in
   sprintf
     "%s 200 OK\r\n\
      Date: %s\r\n\
-     Connection: Keep-Alive\r\n\
+     Connection: Closed\r\n\
      Server: HelloFromOcaml/1.0\r\n\
      Content-Length: %d\r\n\
      Content-Type: %s; charset=UTF-8\r\n\
@@ -128,7 +139,7 @@ let html_header_and_body uri version body =
      %s"
     version
     (http_date ())
-    (String.length body)
+    body_len
     (content_type_of_ext uri)
     body
 ;;
@@ -149,17 +160,24 @@ let handle_client reader writer =
     if req_terminator_idx >= 0
     then (
       let buffer = Bigstring.unsafe_get_string buffer ~pos:0 ~len:(pos + len) in
-      let kind, header = parse_request buffer in
-      match kind with
-      | Get { uri; version } ->
-        print_s [%message "Received a complete request" (uri : string) (version : string)];
+      let req, header = parse_request buffer in
+      match req with
+      | Valid { kind; uri; version } ->
+        print_s
+          [%message
+            "Received a complete request"
+              (kind : request_kind)
+              (uri : string)
+              (version : string)];
         let path = sanitize_uri uri in
         let body = read_and_subs path header in
-        Writer.write writer (html_header_and_body path version body);
+        let include_body = equal_request_kind kind Get in
+        Writer.write writer (html_header_and_body path version body include_body);
+
         let%map () = Writer.flushed writer in
         `Stop reader
       | Unsupported { issue } -> raise_s [%message "Unsupported request" (issue : string)]
-      | Invalid -> raise_s [%message "Invalid request"])
+      | Invalid -> raise_s [%message "(Invalid request)"])
     else Deferred.return `Continue)
 ;;
 
