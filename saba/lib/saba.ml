@@ -67,7 +67,7 @@ type request_kind =
   | Invalid
 [@@deriving sexp]
 
-let parse_request request : request_kind * string String.Map.t =
+let parse_request request =
   let parse_request_top line =
     let split = String.split_on_chars ~on:[ ' '; '\r' ] line in
     let split = List.take split 3 in
@@ -156,11 +156,11 @@ let handle_client reader writer =
         let path = sanitize_uri uri in
         let body = read_and_subs path header in
         Writer.write writer (html_header_and_body path version body);
-        let%bind () = Writer.flushed writer in
-        Deferred.return `Continue
+        let%map () = Writer.flushed writer in
+        `Stop reader
       | Unsupported { issue } -> raise_s [%message "Unsupported request" (issue : string)]
       | Invalid -> raise_s [%message "Invalid request"])
-    else Deferred.return (`Stop reader))
+    else Deferred.return `Continue)
 ;;
 
 let start_server ~base_dir ~port =
