@@ -2,4 +2,5 @@
  (name test_oserver)
  (libraries base stdio)
  (inline_tests)
- (preprocess (pps ppx_inline_test ppx_assert ppx_expect)))
+ (preprocess
+  (pps ppx_inline_test ppx_assert ppx_expect)))
