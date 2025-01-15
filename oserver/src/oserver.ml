@@ -3,13 +3,9 @@ open! Stdio
 open Async
 module Time = Time_float_unix
 
-let public_dir =
-  let dir = "/Users/nicolas/Projects/personal_v2" in
-  lazy (Filename_unix.realpath dir)
-;;
+let public_dir = ref "UNSET_PATH"
 
 let normalize_path path =
-  let public_dir = Lazy.force public_dir in
   let effective_path =
     match path with
     | "/" -> "/about.html"
@@ -19,14 +15,13 @@ let normalize_path path =
        | _, Some _ -> path
        | base, None -> base ^ ".html")
   in
-  Filename.concat public_dir effective_path
+  Filename.concat !public_dir effective_path
 ;;
 
 let is_safe_path ~normalized_path =
-  let public_dir = Lazy.force public_dir in
   try
     let resolved_path = Filename_unix.realpath normalized_path in
-    String.is_prefix resolved_path ~prefix:public_dir
+    String.is_prefix resolved_path ~prefix:!public_dir
   with
   | _ -> false
 ;;
@@ -56,7 +51,7 @@ let read_and_subs path header =
   then read_cached path
   else (
     let body = read_cached path in
-    if Option.is_some (List.Assoc.find header ~equal:String.equal "hx-request")
+    if Map.mem header "HX-Request"
     then body
     else (
       let template = read_cached (normalize_path "/index") in
@@ -70,7 +65,6 @@ type request_kind =
       }
   | Unsupported of { issue : string }
   | Invalid
-[@@deriving sexp]
 
 let parse_request request =
   let parse_request_top line =
@@ -89,35 +83,31 @@ let parse_request request =
     | _ -> Invalid
   in
   match String.split_lines request with
-  | [] -> Invalid, []
-  | line :: lines ->
-    let kind = parse_request_top line in
+  | [] -> Invalid, Map.empty (module String)
+  | head :: lines ->
+    let kind = parse_request_top head in
     let header =
       lines
       |> List.filter_map ~f:(String.lsplit2 ~on:':')
       |> List.map ~f:(fun (k, v) -> String.strip k, String.strip v)
+      |> Map.of_alist_exn (module String)
     in
     kind, header
 ;;
 
 let content_type_of_ext path =
-  let extension =
-    match String.rindex path '.' with
-    | Some idx -> String.sub path ~pos:(idx + 1) ~len:(String.length path - idx - 1)
-    | None -> ""
-  in
-  match extension with
-  | "html" -> "text/html"
-  | "css" -> "text/css"
-  | "js" -> "application/javascript"
-  | "json" -> "application/json"
-  | "jpg" | "jpeg" -> "image/jpeg"
-  | "png" -> "image/png"
-  | "gif" -> "image/gif"
-  | "svg" -> "image/svg+xml"
-  | "woff" -> "font/woff"
-  | "woff2" -> "font/woff2"
-  | _ -> "application/octet-stream"
+  match String.rsplit2 path ~on:'.' with
+  | Some (_, "html") -> "text/html"
+  | Some (_, "css") -> "text/css"
+  | Some (_, "js") -> "application/javascript"
+  | Some (_, "json") -> "application/json"
+  | Some (_, ("jpg" | "jpeg")) -> "image/jpeg"
+  | Some (_, "png") -> "image/png"
+  | Some (_, "gif") -> "image/gif"
+  | Some (_, "svg") -> "image/svg+xml"
+  | Some (_, "woff") -> "font/woff"
+  | Some (_, "woff2") -> "font/woff2"
+  | Some _ | None -> "application/octet-stream"
 ;;
 
 let http_date () =
@@ -143,49 +133,42 @@ let html_header_and_body uri version body =
 ;;
 
 let handle_client reader writer =
-  let buffer = Bytes.create 8192 in
-  (* 8kb is the size of the largest GET request *)
-  let buf_len = Bytes.length buffer in
-  let terminator = Bytes.unsafe_of_string_promise_no_mutation "\r\n\r\n" in
-  (* Right to left scanning *)
-  let whole_request_read buffer start =
-    let rec aux pos =
-      if pos < start
-      then false
-      else if pos + 4 <= buf_len && Bytes.equal (Bytes.sub buffer ~pos ~len:4) terminator
-      then true
-      else aux (pos - 1)
+  let terminator = Bigstring.of_string "\r\n\r\n" in
+  Reader.read_one_chunk_at_a_time reader ~handle_chunk:(fun buffer ~pos ~len ->
+    let req_terminator_idx =
+      Bigstring.unsafe_memmem
+        ~haystack:buffer
+        ~needle:terminator
+        ~haystack_pos:pos
+        ~haystack_len:len
+        ~needle_pos:0
+        ~needle_len:4
     in
-    aux (buf_len - 4)
-  in
-  let rec read_and_parse pos =
-    match%bind Reader.read reader buffer ~pos with
-    | `Eof -> Deferred.never ()
-    | `Ok bytes_read ->
-      if whole_request_read buffer pos
-      then (
-        let buffer = Bytes.unsafe_to_string ~no_mutation_while_string_reachable:buffer in
-        let kind, header = parse_request buffer in
-        (* print_s ([%sexp_of : (string * string) list] header); *)
-        match kind with
-        | Get { uri; version } ->
-          print_s
-            [%message "Received a complete request" (uri : string) (version : string)];
-          let path = sanitize_uri uri in
-          let body = read_and_subs path header in
-          Writer.write writer (html_header_and_body path version body);
-          Writer.flushed writer
-        | Unsupported { issue } ->
-          raise_s [%message "Unsupported request" (issue : string)]
-        | Invalid -> raise_s [%message "Invalid request"])
-      else read_and_parse (pos + bytes_read)
-  in
-  read_and_parse 0
+    (* Since we've found the terminator, we know the complete request has been read *)
+    if req_terminator_idx >= 0
+    then (
+      let buffer = Bigstring.unsafe_get_string buffer ~pos:0 ~len:(pos + len) in
+      let kind, header = parse_request buffer in
+      match kind with
+      | Get { uri; version } ->
+        print_s [%message "Received a complete request" (uri : string) (version : string)];
+        let path = sanitize_uri uri in
+        let body = read_and_subs path header in
+        Writer.write writer (html_header_and_body path version body);
+        let%bind () = Writer.flushed writer in
+        Deferred.return `Continue
+      | Unsupported { issue } -> raise_s [%message "Unsupported request" (issue : string)]
+      | Invalid -> raise_s [%message "Invalid request"])
+    else Deferred.return (`Stop reader))
 ;;
 
 let start_server port =
   (* Disable backtraces on exceptions. *)
   Unix.putenv ~key:"OCAMLRUNPARAM" ~data:"b=0";
+  (public_dir
+   := match Unix.getenv "BASE_DIR" with
+      | Some dir -> Filename_unix.realpath dir
+      | None -> raise_s [%message "(failed to set 'BASE_DIR' env variable)"]);
   let exception_handler _addr exn =
     let exn = Monitor.extract_exn exn in
     print_endline (Exn.to_string exn)
@@ -195,7 +178,9 @@ let start_server port =
     Tcp.Server.create
       ~on_handler_error:(`Call exception_handler)
       where_to_listen
-      (fun _addr reader writer -> handle_client reader writer)
+      (fun _addr reader writer ->
+         let%bind _ = handle_client reader writer in
+         Deferred.unit)
   in
   print_s [%message "Server is listening" (port : int)];
   Deferred.never ()
