@@ -2,8 +2,8 @@ open! Core
 open Async
 
 type request_kind =
-  | Get
-  | Head
+  | GET
+  | HEAD
 [@@deriving equal, sexp]
 
 type request =

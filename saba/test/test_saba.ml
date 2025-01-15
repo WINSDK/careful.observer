@@ -8,7 +8,7 @@ let%expect_test "parse_request_tests" =
     print_s [%sexp (result : request * string String.Map.t)]
   in
   print_parse "GET /index HTTP/1.1\r\nHost: a.com\r\n\r\n";
-  [%expect {| ((Valid (kind Get) (uri /index) (version HTTP/1.1)) ((Host a.com))) |}];
+  [%expect {| ((Valid (kind GET) (uri /index) (version HTTP/1.1)) ((host a.com))) |}];
   print_parse "POST /submit HTTP/1.1\r\n";
   [%expect {| ((Unsupported (issue POST)) ()) |}];
   print_parse "POST /submitHTTP/1.1\r\n";
@@ -16,11 +16,11 @@ let%expect_test "parse_request_tests" =
   print_parse "POST /submit?a=100 HTTP/1.1\r\n";
   [%expect {| ((Unsupported (issue POST)) ()) |}];
   print_parse "GET /submit?a=100 HTTP/1.1\r\n";
-  [%expect {| ((Valid (kind Get) (uri /submit?a=100) (version HTTP/1.1)) ()) |}];
+  [%expect {| ((Valid (kind GET) (uri /submit?a=100) (version HTTP/1.1)) ()) |}];
   print_parse "GET /submit?a=100 HTTP/3\r\n";
   [%expect {| ((Unsupported (issue HTTP/3)) ()) |}];
   print_parse "GET /index.html HTTP/1.0";
-  [%expect {| ((Valid (kind Get) (uri /index.html) (version HTTP/1.0)) ()) |}];
+  [%expect {| ((Valid (kind GET) (uri /index.html) (version HTTP/1.0)) ()) |}];
 ;;
 
 let%test_unit "content_type_tests" =

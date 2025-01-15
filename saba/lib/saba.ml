@@ -5,7 +5,7 @@ module Time = Time_float_unix
 
 let public_dir = ref "UNSET_PATH"
 
-let normalize_path path =
+let extract_uri_path path =
   let effective_path =
     match path with
     | "/" -> "/about.html"
@@ -24,13 +24,6 @@ let is_safe_path ~normalized_path =
     String.is_prefix resolved_path ~prefix:!public_dir
   with
   | _ -> false
-;;
-
-let sanitize_uri uri =
-  let path = normalize_path uri in
-  if is_safe_path ~normalized_path:path
-  then path
-  else raise_s [%message "Not a path within our defined public_dir" (path : string)]
 ;;
 
 let cache = ref (Map.empty (module String))
@@ -54,13 +47,13 @@ let read_and_subs path header =
     if Map.mem header "hx-request"
     then body
     else (
-      let template = read_cached (normalize_path "/index") in
+      let template = read_cached (extract_uri_path "/index") in
       String.substr_replace_first template ~pattern:"{{ content-body }}" ~with_:body))
 ;;
 
 type request_kind =
-  | Get
-  | Head
+  | GET
+  | HEAD
 [@@deriving equal, sexp]
 
 type request =
@@ -75,20 +68,15 @@ type request =
 
 let parse_request request =
   let parse_request_top line =
-    let split = String.split_on_chars ~on:[ ' '; '\r' ] line in
-    let split = List.take split 3 in
-    match split with
-    | [ kind; uri; version ] ->
-      (match kind with
-       | "GET" | "HEAD" ->
-         let kind = if String.equal kind "GET" then Get else Head in
-         (match version with
-          | "HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2" | "HTTP/2" ->
-            Valid { kind; uri; version }
-          | "HTTP/3" -> Unsupported { issue = "HTTP/3" }
-          | _ -> Invalid)
-       | ("PUT" | "DELETE" | "POST") as issue -> Unsupported { issue }
-       | _ -> Invalid)
+    match String.split_on_chars ~on:[ ' '; '\r' ] line with
+    | [ "GET"; uri; (("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") as version) ] ->
+      Valid { kind = GET; uri; version }
+    | [ "HEAD"; uri; (("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") as version) ] ->
+      Valid { kind = HEAD; uri; version }
+    | [ kind; _uri; ("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") ] ->
+      Unsupported { issue = kind }
+    | [ _kind; _uri; (("HTTP/2" | "HTTP/3") as version) ] ->
+      Unsupported { issue = version }
     | _ -> Invalid
   in
   match String.split_lines request with
@@ -126,8 +114,6 @@ let http_date () =
 ;;
 
 let html_header_and_body uri version body include_body =
-  let body_len = String.length body in
-  let body = if include_body then body else "" in
   sprintf
     "%s 200 OK\r\n\
      Date: %s\r\n\
@@ -139,9 +125,9 @@ let html_header_and_body uri version body include_body =
      %s"
     version
     (http_date ())
-    body_len
+    (String.length body)
     (content_type_of_ext uri)
-    body
+    (if include_body then body else "")
 ;;
 
 let handle_client reader writer =
@@ -169,11 +155,12 @@ let handle_client reader writer =
               (kind : request_kind)
               (uri : string)
               (version : string)];
-        let path = sanitize_uri uri in
+        let path = extract_uri_path uri in
+        if not (is_safe_path ~normalized_path:path)
+        then raise_s [%message "Not a path within our defined public_dir" (path : string)];
         let body = read_and_subs path header in
-        let include_body = equal_request_kind kind Get in
+        let include_body = equal_request_kind kind GET in
         Writer.write writer (html_header_and_body path version body include_body);
-
         let%map () = Writer.flushed writer in
         `Stop reader
       | Unsupported { issue } -> raise_s [%message "Unsupported request" (issue : string)]
