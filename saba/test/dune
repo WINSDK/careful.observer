@@ -1,0 +1,6 @@
+(library
+ (name saba_test)
+ (libraries saba core stdio)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane)))

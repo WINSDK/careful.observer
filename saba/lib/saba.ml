@@ -65,8 +65,9 @@ type request_kind =
       }
   | Unsupported of { issue : string }
   | Invalid
+[@@deriving sexp]
 
-let parse_request request =
+let parse_request request : request_kind * string String.Map.t =
   let parse_request_top line =
     let split = String.split_on_chars ~on:[ ' '; '\r' ] line in
     let split = List.take split 3 in
@@ -162,33 +163,19 @@ let handle_client reader writer =
     else Deferred.return (`Stop reader))
 ;;
 
-let start_server port =
-  (* Disable backtraces on exceptions. *)
-  Unix.putenv ~key:"OCAMLRUNPARAM" ~data:"b=0";
-  (public_dir
-   := match Unix.getenv "BASE_DIR" with
-      | Some dir -> Filename_unix.realpath dir
-      | None -> raise_s [%message "(failed to set 'BASE_DIR' env variable)"]);
-  let exception_handler _addr exn =
-    let exn = Monitor.extract_exn exn in
-    print_endline (Exn.to_string exn)
-  in
+let start_server ~base_dir ~port =
+  public_dir := base_dir;
   let where_to_listen = Tcp.Where_to_listen.of_port port in
   let%bind _server =
     Tcp.Server.create
-      ~on_handler_error:(`Call exception_handler)
+      ~on_handler_error:
+        (`Call
+          (fun _addr exn -> eprintf "%s\n%!" (Monitor.extract_exn exn |> Exn.to_string)))
       where_to_listen
       (fun _addr reader writer ->
-         let%bind _ = handle_client reader writer in
-         Deferred.unit)
+        let%bind _ = handle_client reader writer in
+        Deferred.unit)
   in
   print_s [%message "Server is listening" (port : int)];
   Deferred.never ()
-;;
-
-let () =
-  Command.async
-    ~summary:"Simple HTML server"
-    (Command.Param.return (fun () -> start_server 3000))
-  |> Command_unix.run
 ;;

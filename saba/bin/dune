@@ -1,0 +1,11 @@
+(executable
+ (name main)
+ (modes byte exe)
+ (libraries saba ppx_jane async core core_unix.filename_unix stdio)
+ (preprocess
+  (pps ppx_jane)))
+
+(env
+ (release
+  (ocamlopt_flags
+   (:standard -O3))))

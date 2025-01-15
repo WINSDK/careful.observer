@@ -1,5 +1,5 @@
 (lang dune 3.17)
-(name oserver)
+(name saba)
 (generate_opam_files true)
 (source
  (github username/reponame))
@@ -8,7 +8,7 @@
 (license LICENSE)
 (documentation https://url/to/documentation)
 (package
- (name oserver)
+ (name saba)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends ocaml dune)
