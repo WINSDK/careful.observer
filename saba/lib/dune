@@ -3,7 +3,9 @@
  (public_name saba)
  (libraries ppx_jane async core core_unix.filename_unix stdio)
  (preprocess
-  (pps ppx_jane)))
+  (pps ppx_jane))
+ (lint
+   (pps ppx_js_style -annotated-ignores -styler -pretty -dated-deprecation)))
 
 (env
  (release

@@ -5,15 +5,15 @@ module Time = Time_float_unix
 
 let public_dir = ref "UNSET_PATH"
 
-let extract_uri_path path =
+let extract_uri_path uri_path =
   let effective_path =
-    match path with
-    | "/" -> "/about.html"
-    | _ ->
-      let path = String.chop_prefix_if_exists path ~prefix:"/" in
-      (match Filename_base.split_extension path with
-       | _, Some _ -> path
-       | base, None -> base ^ ".html")
+    if String.(uri_path = "/")
+    then "/about.html"
+    else (
+      let normalized_path = String.chop_prefix_if_exists uri_path ~prefix:"/" in
+      match Filename_base.split_extension normalized_path with
+      | _, Some _ -> normalized_path
+      | base, None -> base ^ ".html")
   in
   Filename.concat !public_dir effective_path
 ;;
@@ -23,7 +23,7 @@ let is_safe_path ~normalized_path =
     let resolved_path = Filename_unix.realpath normalized_path in
     String.is_prefix resolved_path ~prefix:!public_dir
   with
-  | _ -> false
+  | _exn -> false
 ;;
 
 let cache = ref (Map.empty (module String))
@@ -51,28 +51,30 @@ let read_and_subs path header =
       String.substr_replace_first template ~pattern:"{{ content-body }}" ~with_:body))
 ;;
 
-type request_kind =
-  | GET
-  | HEAD
-[@@deriving equal, sexp]
+module RequestKind = struct
+  type t =
+    | GET
+    | HEAD
+  [@@deriving equal, compare, sexp]
+end
 
 type request =
   | Valid of
-      { kind : request_kind
+      { kind : RequestKind.t
       ; uri : string
       ; version : string
       }
   | Invalid
   | Unsupported of { issue : string }
-[@@deriving equal, sexp]
+[@@deriving sexp]
 
 let parse_request request =
   let parse_request_top line =
     match String.split_on_chars ~on:[ ' '; '\r' ] line with
     | [ "GET"; uri; (("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") as version) ] ->
-      Valid { kind = GET; uri; version }
+      Valid { kind = RequestKind.GET; uri; version }
     | [ "HEAD"; uri; (("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") as version) ] ->
-      Valid { kind = HEAD; uri; version }
+      Valid { kind = RequestKind.HEAD; uri; version }
     | [ kind; _uri; ("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") ] ->
       Unsupported { issue = kind }
     | [ _kind; _uri; (("HTTP/2" | "HTTP/3") as version) ] ->
@@ -152,14 +154,14 @@ let handle_client reader writer =
         print_s
           [%message
             "Received a complete request"
-              (kind : request_kind)
+              (kind : RequestKind.t)
               (uri : string)
               (version : string)];
         let path = extract_uri_path uri in
         if not (is_safe_path ~normalized_path:path)
         then raise_s [%message "Not a path within our defined public_dir" (path : string)];
         let body = read_and_subs path header in
-        let include_body = equal_request_kind kind GET in
+        let include_body = RequestKind.equal kind RequestKind.GET in
         Writer.write writer (html_header_and_body path version body include_body);
         let%map () = Writer.flushed writer in
         `Stop reader
@@ -178,7 +180,7 @@ let start_server ~base_dir ~port =
           (fun _addr exn -> eprintf "%s\n%!" (Monitor.extract_exn exn |> Exn.to_string)))
       where_to_listen
       (fun _addr reader writer ->
-        let%bind _ = handle_client reader writer in
+        let%bind _result = handle_client reader writer in
         Deferred.unit)
   in
   print_s [%message "Server is listening" (port : int)];

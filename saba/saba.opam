@@ -6,10 +6,15 @@ maintainer: ["Nicolas Mazzon <nicolas@careful.observer>"]
 authors: ["Nicolas Mazzon <nicolas@careful.observer>"]
 license: "LICENSE"
 tags: ["add topics" "to describe" "your" "project"]
-homepage: "https://github.com/username/reponame"
+homepage: "https://github.com/WINSDK/careful.observer"
 doc: "https://url/to/documentation"
-bug-reports: "https://github.com/username/reponame/issues"
+bug-reports: "https://github.com/WINSDK/careful.observer/issues"
 depends: [
+  "stdio" {>= "v0.17"}
+  "ppx_jane" {>= "v0.17"}
+  "core_unix" {>= "v0.17"}
+  "core" {>= "v0.17"}
+  "async" {>= "v0.17"}
   "ocaml"
   "dune" {>= "3.17"}
   "odoc" {with-doc}
@@ -28,4 +33,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/username/reponame.git"
+dev-repo: "git+https://github.com/WINSDK/careful.observer.git"

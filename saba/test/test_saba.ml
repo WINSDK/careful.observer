@@ -20,7 +20,7 @@ let%expect_test "parse_request_tests" =
   print_parse "GET /submit?a=100 HTTP/3\r\n";
   [%expect {| ((Unsupported (issue HTTP/3)) ()) |}];
   print_parse "GET /index.html HTTP/1.0";
-  [%expect {| ((Valid (kind GET) (uri /index.html) (version HTTP/1.0)) ()) |}];
+  [%expect {| ((Valid (kind GET) (uri /index.html) (version HTTP/1.0)) ()) |}]
 ;;
 
 let%test_unit "content_type_tests" =

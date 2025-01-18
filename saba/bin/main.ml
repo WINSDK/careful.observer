@@ -17,7 +17,6 @@ let command =
 let () =
   (* Disable backtraces on exceptions. *)
   Async.Unix.putenv ~key:"OCAMLRUNPARAM" ~data:"b=0";
-
   let result = Result.try_with (fun () -> Command_unix.run command) in
   match result with
   | Ok () -> ()
