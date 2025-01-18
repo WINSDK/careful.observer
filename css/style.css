@@ -32,7 +32,7 @@ a {
 }
 
 .wrapper {
-  max-width: 800px;
+  max-width: 750px;
   margin: 0 auto;
 }
 
@@ -102,7 +102,7 @@ header nav > * {
 }
 /*==== Header ====*/
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   body {
     font-size: 16px;
   }

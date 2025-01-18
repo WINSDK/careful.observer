@@ -32,29 +32,29 @@ Something about not being able to use nginx and writing a server in axum.
 
 ```css
 server {
-    listen 80;
-    server_name careful.observer careful.observer;
+  listen 80;
+  server_name careful.observer careful.observer;
 
-    root /var/www/nicolas/public;
-    index index.html;
+  root /var/www/nicolas/public;
+  index index.html;
 
-    # Serve static files directly.
-    location /static/ {
-        alias /var/www/nicolas/public/static/;
-        expires 30d;
-        add_header Cache-Control "public";
-    }
+  # Serve static files directly.
+  location /static/ {
+    alias /var/www/nicolas/public/static/;
+    expires 30d;
+    add_header Cache-Control "public";
+  }
 
-    # Handle all other routes by serving index.html.
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
+  # Handle all other routes by serving index.html.
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
 
-    # Optional: Handle error pages
-    error_page 404 /index.html;
-    location = /index.html {
-        internal;
-    }
+  # Optional: Handle error pages
+  error_page 404 /index.html;
+  location = /index.html {
+    internal;
+  }
 }
 ```
 
