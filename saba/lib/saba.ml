@@ -86,6 +86,7 @@ module CachedTemplates = struct
   let read ~data_path ~template_path =
     let data_mtime_now = (Core_unix.stat data_path).st_mtime in
     let template_mtime_now = (Core_unix.stat template_path).st_mtime in
+    let add_now () = add data_path data_mtime_now template_path template_mtime_now in
     match Hashtbl.find !cache { template_path; data_path } with
     (* Re-read file if the date modified changed *)
     | Some { computed; template_mtime; data_mtime } ->
@@ -93,14 +94,14 @@ module CachedTemplates = struct
       then (
         let time = Time.of_span_since_epoch (Time.Span.of_sec data_mtime_now) in
         print_s [%message "File modified" (data_path : string) (time : Time.t)];
-        add data_path data_mtime_now template_path template_mtime_now)
+        add_now ())
       else if Float.(template_mtime_now <> template_mtime)
       then (
         let time = Time.of_span_since_epoch (Time.Span.of_sec template_mtime_now) in
         print_s [%message "File modified" (template_path : string) (time : Time.t)];
-        add data_path data_mtime_now template_path template_mtime_now)
+        add_now ())
       else return computed
-    | None -> add data_path data_mtime_now template_path template_mtime_now
+    | None -> add_now ()
   ;;
 end
 
