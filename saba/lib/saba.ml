@@ -70,6 +70,7 @@ module CachedTemplates = struct
   end
 
   let cache = ref (Hashtbl.create (module Key))
+  let index = lazy (extract_uri_path "/index")
 
   let add data_path data_mtime template_path template_mtime =
     let%map with_ = Reader.file_contents data_path
@@ -109,7 +110,7 @@ let read_and_subs ~path ~uri header =
   let is_not_html = List.exists data_dirs ~f:(fun x -> String.is_prefix uri ~prefix:x) in
   if is_not_html || is_ajax_req
   then CachedFiles.read path
-  else CachedTemplates.read ~data_path:path ~template_path:(extract_uri_path "/index")
+  else CachedTemplates.read ~data_path:path ~template_path:(Lazy.force CachedTemplates.index)
 ;;
 
 module RequestKind = struct
