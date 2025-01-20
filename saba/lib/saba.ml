@@ -26,29 +26,90 @@ let is_safe_path ~normalized_path =
   | _exn -> false
 ;;
 
-let cache = ref (Map.empty (module String))
+module CachedFiles = struct
+  type t =
+    { data : string
+    ; mtime : float
+    }
 
-let read_cached path =
-  match Map.find !cache path with
-  | Some data ->
-    print_s [%message "Hit the cache" (path : string)];
-    data
-  | None ->
-    let data = In_channel.read_all path in
-    cache := Map.set !cache ~key:path ~data;
-    data
-;;
+  let cache = ref (Hashtbl.create (module String))
 
-let read_and_subs path header =
-  if String.is_prefix path ~prefix:"css/" || String.is_prefix path ~prefix:"assets/"
-  then read_cached path
-  else (
-    let body = read_cached path in
-    if Map.mem header "hx-request"
-    then body
-    else (
-      let template = read_cached (extract_uri_path "/index") in
-      String.substr_replace_first template ~pattern:"{{ content-body }}" ~with_:body))
+  let add path mtime =
+    let%bind data = Reader.file_contents path in
+    Hashtbl.set !cache ~key:path ~data:{ data; mtime };
+    return data
+  ;;
+
+  let read path =
+    let mtime_now = (Core_unix.stat path).st_mtime in
+    match Hashtbl.find !cache path with
+    (* Re-read file if the date modified changed *)
+    | Some { data; mtime; } ->
+      if Float.(mtime_now <> mtime) then
+        let time = Time.of_span_since_epoch (Time.Span.of_sec mtime_now) in
+        print_s [%message "File modified" (path : string) (time : Time.t)];
+        add path mtime_now
+      else return data
+    | None -> add path mtime_now
+  ;;
+end
+
+module CachedTemplates = struct
+  type t =
+    { computed : string
+    ; template_mtime : float
+    ; data_mtime : float
+    }
+
+  module Key = struct
+    type t =
+      { template_path : string
+      ; data_path : string
+      }
+    [@@deriving compare, sexp, hash]
+  end
+
+  let cache = ref (Hashtbl.create (module Key))
+
+  let add data_path data_mtime template_path template_mtime =
+    let%map with_ = Reader.file_contents data_path
+    and template = Reader.file_contents template_path in
+    let pattern = "{{ content-body }}" in
+    let computed = String.substr_replace_first template ~pattern ~with_ in
+    let key : Key.t = { template_path; data_path } in
+    let data : t = { computed; template_mtime; data_mtime } in
+    Hashtbl.set !cache ~key ~data;
+    computed
+  ;;
+
+  let read ~data_path ~template_path =
+    let data_mtime_now = (Core_unix.stat data_path).st_mtime in
+    let template_mtime_now = (Core_unix.stat template_path).st_mtime in
+    match Hashtbl.find !cache { template_path; data_path } with
+    (* Re-read file if the date modified changed *)
+    | Some { computed; template_mtime; data_mtime } ->
+      if Float.(data_mtime_now <> data_mtime)
+      then (
+        let time = Time.of_span_since_epoch (Time.Span.of_sec data_mtime_now) in
+        print_s [%message "File modified" (data_path : string) (time : Time.t)];
+        add data_path data_mtime_now template_path template_mtime_now)
+      else if Float.(template_mtime_now <> template_mtime)
+      then (
+        let time = Time.of_span_since_epoch (Time.Span.of_sec template_mtime_now) in
+        print_s [%message "File modified" (template_path : string) (time : Time.t)];
+        add data_path data_mtime_now template_path template_mtime_now)
+      else return computed
+    | None -> add data_path data_mtime_now template_path template_mtime_now
+  ;;
+end
+
+let read_and_subs ~path ~uri header =
+  let is_ajax_req = Map.mem header "hx-request" in
+  let data_dirs = [ "/css"; "/assets" ] in
+  let is_not_html = List.exists data_dirs ~f:(fun x -> String.is_prefix uri ~prefix:x) in
+  if is_not_html || is_ajax_req
+  then CachedFiles.read path
+  else CachedTemplates.read ~data_path:path ~template_path:(extract_uri_path "/index")
 ;;
 
 module RequestKind = struct
@@ -115,7 +176,7 @@ let http_date () =
   Time.format ~zone:Time.Zone.utc now "%a, %d %b %Y %H:%M:%S GMT"
 ;;
 
-let html_header_and_body uri version body include_body =
+let html_header uri version body =
   sprintf
     "%s 200 OK\r\n\
      Date: %s\r\n\
@@ -123,13 +184,19 @@ let html_header_and_body uri version body include_body =
      Server: HelloFromOcaml/1.0\r\n\
      Content-Length: %d\r\n\
      Content-Type: %s; charset=UTF-8\r\n\
-     \r\n\
-     %s"
+     \r\n"
     version
     (http_date ())
     (String.length body)
     (content_type_of_ext uri)
-    (if include_body then body else "")
+;;
+
+let send_response writer ~uri ~path kind header version =
+  let include_body = RequestKind.equal kind RequestKind.GET in
+  let%bind body = read_and_subs ~uri ~path header in
+  Writer.write writer (html_header path version body);
+  if include_body then Writer.write writer body;
+  return ()
 ;;
 
 let handle_client reader writer =
@@ -160,14 +227,12 @@ let handle_client reader writer =
         let path = extract_uri_path uri in
         if not (is_safe_path ~normalized_path:path)
         then raise_s [%message "Not a path within our defined public_dir" (path : string)];
-        let body = read_and_subs path header in
-        let include_body = RequestKind.equal kind RequestKind.GET in
-        Writer.write writer (html_header_and_body path version body include_body);
-        let%map () = Writer.flushed writer in
+        let%map () = send_response writer ~uri ~path kind header version
+        and () = Writer.flushed writer in
         `Stop reader
       | Unsupported { issue } -> raise_s [%message "Unsupported request" (issue : string)]
       | Invalid -> raise_s [%message "(Invalid request)"])
-    else Deferred.return `Continue)
+    else return `Continue)
 ;;
 
 let start_server ~base_dir ~port =
@@ -179,9 +244,7 @@ let start_server ~base_dir ~port =
         (`Call
           (fun _addr exn -> eprintf "%s\n%!" (Monitor.extract_exn exn |> Exn.to_string)))
       where_to_listen
-      (fun _addr reader writer ->
-        let%bind _result = handle_client reader writer in
-        Deferred.unit)
+      (fun _addr reader writer -> handle_client reader writer >>| ignore)
   in
   print_s [%message "Server is listening" (port : int)];
   Deferred.never ()
