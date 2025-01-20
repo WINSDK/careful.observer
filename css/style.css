@@ -67,14 +67,9 @@ header nav {
 }
 
 header nav a {
-  user-select: none;
   color: #faa21c;
   text-decoration: none;
   font-weight: bold;
-}
-
-header nav a:hover {
-  text-decoration: underline;
 }
 
 header nav > * {
@@ -101,6 +96,23 @@ header nav > * {
   font-weight: bold;
 }
 /*==== Header ====*/
+
+.animated-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.animated-link:hover .underline {
+  width: 100%;
+}
+
+.underline {
+  height: 0.12em;
+  width: 0%;
+  background: orange;
+  transition: width 0.2s;
+}
 
 @media (max-width: 800px) {
   body {
