@@ -44,11 +44,12 @@ module CachedFiles = struct
     let mtime_now = (Core_unix.stat path).st_mtime in
     match Hashtbl.find !cache path with
     (* Re-read file if the date modified changed *)
-    | Some { data; mtime; } ->
-      if Float.(mtime_now <> mtime) then
+    | Some { data; mtime } ->
+      if Float.(mtime_now <> mtime)
+      then (
         let time = Time.of_span_since_epoch (Time.Span.of_sec mtime_now) in
         print_s [%message "File modified" (path : string) (time : Time.t)];
-        add path mtime_now
+        add path mtime_now)
       else return data
     | None -> add path mtime_now
   ;;
@@ -111,7 +112,9 @@ let read_and_subs ~path ~uri header =
   let is_not_html = List.exists data_dirs ~f:(fun x -> String.is_prefix uri ~prefix:x) in
   if is_not_html || is_ajax_req
   then CachedFiles.read path
-  else CachedTemplates.read ~data_path:path ~template_path:(Lazy.force CachedTemplates.index)
+  else
+    let template_path = Lazy.force CachedTemplates.index in
+    CachedTemplates.read ~data_path:path ~template_path
 ;;
 
 module RequestKind = struct
@@ -182,7 +185,7 @@ let html_header uri version body =
   sprintf
     "%s 200 OK\r\n\
      Date: %s\r\n\
-     Connection: Closed\r\n\
+     Connection: Keep-Alive\r\n\
      Server: HelloFromOcaml/1.0\r\n\
      Content-Length: %d\r\n\
      Content-Type: %s; charset=UTF-8\r\n\
@@ -231,7 +234,9 @@ let handle_client reader writer =
         then raise_s [%message "Not a path within our defined public_dir" (path : string)];
         let%map () = send_response writer ~uri ~path kind header version
         and () = Writer.flushed writer in
-        `Stop reader
+        (match Map.find header "connection" with
+         | Some "close" -> `Stop reader
+         | Some _ | None -> `Consumed (len, `Need_unknown))
       | Unsupported { issue } -> raise_s [%message "Unsupported request" (issue : string)]
       | Invalid -> raise_s [%message "(Invalid request)"])
     else return `Continue)

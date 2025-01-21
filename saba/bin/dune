@@ -1,7 +1,7 @@
 (executable
  (name main)
  (modes byte exe)
- (libraries saba ppx_jane async core core_unix.filename_unix stdio)
+ (libraries saba ppx_jane async core)
  (preprocess
   (pps ppx_jane)))
 
