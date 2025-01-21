@@ -236,7 +236,9 @@ let handle_client reader writer =
         and () = Writer.flushed writer in
         (match Map.find header "connection" with
          | Some "close" -> `Stop reader
-         | Some _ | None -> `Consumed (len, `Need_unknown))
+         | Some _ | None ->
+             let bytes_read = req_terminator_idx + (Bigstring.length terminator) - pos in
+             `Consumed (bytes_read, `Need_unknown))
       | Unsupported { issue } -> raise_s [%message "Unsupported request" (issue : string)]
       | Invalid -> raise_s [%message "(Invalid request)"])
     else return `Continue)
