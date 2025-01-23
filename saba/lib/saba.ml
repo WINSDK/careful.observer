@@ -19,11 +19,9 @@ let extract_uri_path uri_path =
 ;;
 
 let is_safe_path ~normalized_path =
-  try
-    let resolved_path = Filename_unix.realpath normalized_path in
-    String.is_prefix resolved_path ~prefix:!public_dir
-  with
-  | _exn -> false
+  match Filename_unix.realpath normalized_path with
+  | resolved_path -> String.is_prefix resolved_path ~prefix:!public_dir
+  | exception _exn -> false
 ;;
 
 module CachedFiles = struct
@@ -112,9 +110,9 @@ let read_and_subs ~path ~uri header =
   let is_not_html = List.exists data_dirs ~f:(fun x -> String.is_prefix uri ~prefix:x) in
   if is_not_html || is_ajax_req
   then CachedFiles.read path
-  else
+  else (
     let template_path = Lazy.force CachedTemplates.index in
-    CachedTemplates.read ~data_path:path ~template_path
+    CachedTemplates.read ~data_path:path ~template_path)
 ;;
 
 module RequestKind = struct
@@ -237,8 +235,8 @@ let handle_client reader writer =
         (match Map.find header "connection" with
          | Some "close" -> `Stop reader
          | Some _ | None ->
-             let bytes_read = req_terminator_idx + (Bigstring.length terminator) - pos in
-             `Consumed (bytes_read, `Need_unknown))
+           let bytes_read = req_terminator_idx + Bigstring.length terminator - pos in
+           `Consumed (bytes_read, `Need_unknown))
       | Unsupported { issue } -> raise_s [%message "Unsupported request" (issue : string)]
       | Invalid -> raise_s [%message "(Invalid request)"])
     else return `Continue)
