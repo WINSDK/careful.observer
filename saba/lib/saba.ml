@@ -33,9 +33,9 @@ module CachedFiles = struct
   let cache = ref (Hashtbl.create (module String))
 
   let add path mtime =
-    let%bind data = Reader.file_contents path in
+    let%map data = Reader.file_contents path in
     Hashtbl.set !cache ~key:path ~data:{ data; mtime };
-    return data
+    data
   ;;
 
   let read path =
@@ -196,10 +196,9 @@ let html_header uri version body =
 
 let send_response writer ~uri ~path kind header version =
   let include_body = RequestKind.equal kind RequestKind.GET in
-  let%bind body = read_and_subs ~uri ~path header in
+  let%map body = read_and_subs ~uri ~path header in
   Writer.write writer (html_header path version body);
   if include_body then Writer.write writer body;
-  return ()
 ;;
 
 let handle_client reader writer =
@@ -243,7 +242,7 @@ let handle_client reader writer =
 ;;
 
 let start_server ~base_dir ~port =
-  public_dir := base_dir;
+  public_dir := Filename_unix.realpath base_dir;
   let where_to_listen = Tcp.Where_to_listen.of_port port in
   let%bind _server =
     Tcp.Server.create
