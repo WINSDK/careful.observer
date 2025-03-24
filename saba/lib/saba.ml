@@ -3,6 +3,9 @@ open! Stdio
 open Async
 module Time = Time_float_unix
 
+let ( << ) f g x = f (g x)
+let ( >> ) f g x = g (f x)
+
 let public_dir = ref "UNSET_PATH"
 
 let extract_uri_path uri_path =
@@ -115,49 +118,48 @@ let read_and_subs ~path ~uri header =
     CachedTemplates.read ~data_path:path ~template_path)
 ;;
 
-module RequestKind = struct
-  type t =
+module Request = struct
+  type kind =
     | GET
     | HEAD
-  [@@deriving equal, compare, sexp]
-end
+  [@@deriving sexp, equal]
 
-type request =
-  | Valid of
-      { kind : RequestKind.t
-      ; uri : string
-      ; version : string
-      }
-  | Invalid
-  | Unsupported of { issue : string }
-[@@deriving sexp]
+  type t =
+    | Valid of
+        { kind : kind
+        ; uri : string
+        ; version : string
+        }
+    | Invalid
+    | Unsupported of { issue : string }
+  [@@deriving sexp, equal]
 
-let parse_request request =
-  let parse_request_top line =
-    match String.split_on_chars ~on:[ ' '; '\r' ] line with
+  let of_head str =
+    match String.split_on_chars ~on:[ ' '; '\r' ] str with
     | [ "GET"; uri; (("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") as version) ] ->
-      Valid { kind = RequestKind.GET; uri; version }
+      Valid { kind = GET; uri; version }
     | [ "HEAD"; uri; (("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") as version) ] ->
-      Valid { kind = RequestKind.HEAD; uri; version }
+      Valid { kind = HEAD; uri; version }
     | [ kind; _uri; ("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") ] ->
       Unsupported { issue = kind }
     | [ _kind; _uri; (("HTTP/2" | "HTTP/3") as version) ] ->
       Unsupported { issue = version }
     | _ -> Invalid
-  in
-  match String.split_lines request with
-  | [] -> Invalid, Map.empty (module String)
-  | head :: lines ->
-    let kind = parse_request_top head in
-    let header =
-      lines
-      |> List.filter_map ~f:(String.lsplit2 ~on:':')
-      |> List.map ~f:(fun (k, v) -> String.strip k, String.strip v)
-      |> List.map ~f:(fun (k, v) -> String.lowercase k, String.lowercase v)
-      |> Map.of_alist_exn (module String)
-    in
-    kind, header
-;;
+  ;;
+
+  let parse str =
+    match String.split_lines str with
+    | [] -> Invalid, String.Map.empty
+    | head :: lines ->
+      let header =
+        lines
+        |> List.filter_map ~f:(String.lsplit2 ~on:':')
+        |> List.map ~f:(Tuple2.map ~f:(String.strip >> String.lowercase))
+        |> String.Map.of_alist_exn
+      in
+      of_head head, header
+  ;;
+end
 
 let content_type_of_ext path =
   match String.rsplit2 path ~on:'.' with
@@ -195,10 +197,10 @@ let html_header uri version body =
 ;;
 
 let send_response writer ~uri ~path kind header version =
-  let include_body = RequestKind.equal kind RequestKind.GET in
+  let include_body = Request.equal_kind kind Request.GET in
   let%map body = read_and_subs ~uri ~path header in
   Writer.write writer (html_header path version body);
-  if include_body then Writer.write writer body;
+  if include_body then Writer.write writer body
 ;;
 
 let handle_client reader writer =
@@ -217,13 +219,13 @@ let handle_client reader writer =
     if req_terminator_idx >= 0
     then (
       let buffer = Bigstring.unsafe_get_string buffer ~pos:0 ~len:(pos + len) in
-      let req, header = parse_request buffer in
+      let req, header = Request.parse buffer in
       match req with
       | Valid { kind; uri; version } ->
         print_s
           [%message
             "Received a complete request"
-              (kind : RequestKind.t)
+              (kind : Request.kind)
               (uri : string)
               (version : string)];
         let path = extract_uri_path uri in
@@ -248,7 +250,7 @@ let start_server ~base_dir ~port =
     Tcp.Server.create
       ~on_handler_error:
         (`Call
-          (fun _addr exn -> eprintf "%s\n%!" (Monitor.extract_exn exn |> Exn.to_string)))
+            (fun _addr exn -> eprintf "%s\n%!" (Monitor.extract_exn exn |> Exn.to_string)))
       where_to_listen
       (fun _addr reader writer -> handle_client reader writer >>| ignore)
   in
