@@ -4,8 +4,8 @@ open Saba
 
 let%expect_test "parse_request_tests" =
   let print_parse input =
-    let result = parse_request input in
-    print_s [%sexp (result : request * string String.Map.t)]
+    let result = Request.parse input in
+    print_s [%sexp (result : Request.t * string String.Map.t)]
   in
   print_parse "GET /index HTTP/1.1\r\nHost: a.com\r\n\r\n";
   [%expect {| ((Valid (kind GET) (uri /index) (version HTTP/1.1)) ((host a.com))) |}];

@@ -1,9 +1,8 @@
 open! Core
-open! Stdio
-open Async
+open! Async
+
 module Time = Time_float_unix
 
-let ( << ) f g x = f (g x)
 let ( >> ) f g x = g (f x)
 
 let public_dir = ref "UNSET_PATH"
@@ -134,16 +133,20 @@ module Request = struct
     | Unsupported of { issue : string }
   [@@deriving sexp, equal]
 
+  let is_supported_version verion =
+    let supported = [ "HTTP/0.9"; "HTTP/1.0"; "HTTP/1.1"; "HTTP/1.2" ] in
+    List.mem supported version ~equal:String.equal
+  ;;
+
   let of_head str =
     match String.split_on_chars ~on:[ ' '; '\r' ] str with
-    | [ "GET"; uri; (("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") as version) ] ->
-      Valid { kind = GET; uri; version }
-    | [ "HEAD"; uri; (("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") as version) ] ->
-      Valid { kind = HEAD; uri; version }
-    | [ kind; _uri; ("HTTP/0.9" | "HTTP/1.0" | "HTTP/1.1" | "HTTP/1.2") ] ->
-      Unsupported { issue = kind }
-    | [ _kind; _uri; (("HTTP/2" | "HTTP/3") as version) ] ->
-      Unsupported { issue = version }
+    | [ kind; uri; version ] ->
+      if is_supported_version version
+      then (
+        if String.(kind = "GET") then Valid { kind = GET; uri; version }
+        else if String.(kind = "HEAD") then Valid { kind = HEAD; uri; version }
+        else Unsupported { issue = kind }
+      ) else Unsupported { issue = version }
     | _ -> Invalid
   ;;
 

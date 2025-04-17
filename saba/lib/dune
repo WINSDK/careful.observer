@@ -2,6 +2,7 @@
  (name saba)
  (public_name saba)
  (libraries ppx_jane async core core_unix.filename_unix stdio)
+ (inline_tests)
  (preprocess
   (pps ppx_jane))
  (lint
