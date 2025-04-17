@@ -19,7 +19,8 @@ for md_file in ../posts/*.md; do
          --template=template.html \
          --highlight-style=gruvbox.theme \
          --syntax-definition=rust.xml \
-         --lua-filter=split_blockquotes.lua \
+         --syntax-definition=ocaml.xml \
+         --lua-filter=links.lua \
          --standalone \
          --output="$html_file"
 

@@ -1,30 +1,84 @@
+<script>
+
+var orig = {
+  title: document.title,
+  meta: {
+    nameTitle: null,
+    twitter:   null,
+    og:        null,
+  }
+};
+
+var m1 = document.head.querySelector('meta[name="title"]'),
+    m2 = document.head.querySelector('meta[property="twitter:title"]'),
+    m3 = document.head.querySelector('meta[property="og:title"]');
+
+if (m1) orig.meta.nameTitle = m1.getAttribute('content');
+if (m2) orig.meta.twitter   = m2.getAttribute('content');
+if (m3) orig.meta.og        = m3.getAttribute('content');
+
+function applyMeta(){
+  document.title = '$title$';
+  if (m1) m1.content = '$title$';
+  if (m2) m2.content = '$title$';
+  if (m3) m3.content = '$title$';
+}
+
+document.body.addEventListener('htmx:beforeSwap', function(evt){
+  document.title = orig.title;
+  if (m1 && orig.meta.nameTitle !== null) m1.content = orig.meta.nameTitle;
+  if (m2 && orig.meta.twitter   !== null) m2.content = orig.meta.twitter;
+  if (m3 && orig.meta.og        !== null) m3.content = orig.meta.og;
+}, {once: true});
+
+applyMeta()
+</script>
 <style>
-body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, hr, dl, dd, ol, ul, figure {
+body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure {
   margin: 0;
   padding: 0;
 }
 
-h1, h2, h3, h4, h5, h6, p, blockquote, pre, ul, ol, dl, figure, .highlight {
+h1, h2, h3, h4, h5, h6, p, blockquote, pre, hr, ul, ol, dl, figure, .highlight {
   margin-bottom: 15px;
 }
 
 code {
-  background: #8e5a1d;
   font-family: "Berkeley", monospace;
 }
 
-blockquote > p {
-  margin-bottom: 0;
+code:not(:has(span)) {
+  background: #373737;
+  padding: 1.5px 3px;
+  vertical-align: middle;
 }
 
-blockquote > p::before {
-  content: "> ";
-  user-select: none;
-  color: pink;
+blockquote {
+  color: #dedede;
+  padding: 0 1rem;
+  border-left: 3px solid #888;
 }
 
-li {
-  margin-left: 1.5rem;
+a:has(> code) {
+  text-decoration: none;
+}
+
+ul li {
+ margin-left: 1.5rem;
+}
+
+ol li {
+ margin-left: 2.5rem;
+}
+
+/* Remove indent on nested lists */
+li li {
+  margin-left: 1rem;
+}
+
+ol ul {
+  margin-top: 15px;
+  list-style-type: disc;
 }
 
 .wrapper {
@@ -39,7 +93,22 @@ li {
   margin-bottom: 2rem;
 }
 
+/* Match on citation references */
+[href^="#0"],
+[href^="#1"],
+[href^="#2"],
+[href^="#3"],
+[href^="#4"],
+[href^="#5"],
+[href^="#6"],
+[href^="#7"],
+[href^="#8"],
+[href^="#9"] {
+  text-decoration: none;
+}
+
 img {
+  image-rendering: pixelated;
   max-width: 100%;
 }
 
